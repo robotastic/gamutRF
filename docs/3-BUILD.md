@@ -80,7 +80,7 @@ Reboot
 
 8. Install GamutRF and BirdsEye
 ```
-cd gamutRF && docker compose -f orchestrator.yml pull && cd ..
+cd gamutRF && docker compose -f orchestrator.yml -f torchserve.yml pull && cd ..
 cd BirdsEye && pip3 install -r requirements.txt && cd ..
 ```
 

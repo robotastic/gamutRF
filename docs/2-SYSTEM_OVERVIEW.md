@@ -98,7 +98,7 @@ Aside from the control APIs, GamutRF’s primary data transport between componen
 
 ## GNU radio 
 
-GNU Radio7 was used throughout the course of development for this effort. GNU Radio is an open-source SDR framework used for developing prototypes and signal processing blocks. It supports a variety RF hardware like the radios previously mentioned to create software-defined radio-based systems, or without hardware to simulate or evaluate a waveform or signal flow. GNU Radio provides pre-defined signal processing blocks that have been thoroughly tested which can be used to build waveforms. It also lets you easily build custom blocks that can be integrated into a signal flow.  GNU Radio has a well-documented and supported API and has a large user-base with a lot of community support.  
+GNU Radio was used throughout the course of development for this effort. GNU Radio is an open-source SDR framework used for developing prototypes and signal processing blocks. It supports a variety RF hardware like the radios previously mentioned to create software-defined radio-based systems, or without hardware to simulate or evaluate a waveform or signal flow. GNU Radio provides pre-defined signal processing blocks that have been thoroughly tested which can be used to build waveforms. It also lets you easily build custom blocks that can be integrated into a signal flow.  GNU Radio has a well-documented and supported API and has a large user-base with a lot of community support.  
 
 ### GNU Radio Out-Of-Tree Modules 
 
