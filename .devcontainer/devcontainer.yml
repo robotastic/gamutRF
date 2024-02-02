@@ -1,0 +1,102 @@
+version: "3.3"
+networks:
+  gamutrf:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 9000
+services:
+  mqtt:
+    restart: always
+    image: iqtlabs/edgetech-mqtt-dev:latest
+    networks:
+      - gamutrf
+    ports:
+      - '1883:1883'
+  gamutrf:
+    restart: always
+    env_file: devcontainer.env
+    build: 
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.devcontainer
+    networks:
+      - gamutrf
+    ports:
+      - '9001:9000'
+      - '10000:10000'
+      - '10001:10001'
+    cap_add:
+      - SYS_NICE
+      - SYS_RAWIO
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    # nvidia container toolkit etc must be installed.
+    # Comment out "deploy" if on non-x86 platform (e.g. Pi4)
+ #   deploy:
+ #     resources:
+ #       reservations:
+ #         devices:
+ #           - driver: nvidia
+ #             count: 1
+ #             capabilities: [gpu]
+    # if torchserve is not being used, comment out the
+    # dependency.
+ #   depends_on:
+ #     torchserve:
+ #       condition: service_healthy
+    volumes:
+      - ../..:/workspaces:cached
+      - '${VOL_PREFIX}:/logs'
+    command: sleep infinity
+    healthcheck:
+      test: [CMD, "/gamutrf/bin/scanhc.sh", "9000"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+  sigfinder:
+    restart: always
+    image: iqtlabs/gamutrf:latest
+    env_file: devcontainer.env
+    shm_size: 128m
+    privileged: true
+    networks:
+      - gamutrf
+    ports:
+      - '80:80'
+      - '9002:9000'
+    volumes:
+      - '${VOL_PREFIX}:/logs'
+    command:
+      - gamutrf-sigfinder
+      - --scanners=gamutrf:10000
+      - --log=/logs/scan.log
+      - --detection_type=narrowband
+      - --record_secs=1
+      - --max_recorder_signals=5
+      - --db_rolling_factor=0
+    environment:
+      - "PEAK_TRIGGER=0"
+      - "PIN_TRIGGER=17"
+  waterfall:
+    restart: always
+    image: iqtlabs/gamutrf-waterfall:latest
+    env_file: devcontainer.env
+    networks:
+      - gamutrf
+    ports:
+      - '9003:9003'
+    volumes:
+      - '${VOL_PREFIX}:/logs'
+    command:
+      - gamutrf-waterfall
+      - --scanners=gamutrf:10000
+      - --inference_server=gamutrf
+      - --inference_port=10001
+      - --save_path=/logs/waterfall
+      - --port=9003
+      - --detection_type=narrowband
+      - --n_detect=1
+      - --width=12
+      - --height=6
+      - --min_freq=0
+      - --max_freq=0
