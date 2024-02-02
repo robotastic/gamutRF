@@ -14,7 +14,6 @@ services:
       - '1883:1883'
   gamutrf:
     restart: always
-    env_file: devcontainer.env
     build: 
       context: ..
       dockerfile: .devcontainer/Dockerfile.devcontainer
@@ -56,7 +55,6 @@ services:
   sigfinder:
     restart: always
     image: iqtlabs/gamutrf:latest
-    env_file: devcontainer.env
     shm_size: 128m
     privileged: true
     networks:
@@ -80,7 +78,6 @@ services:
   waterfall:
     restart: always
     image: iqtlabs/gamutrf-waterfall:latest
-    env_file: devcontainer.env
     networks:
       - gamutrf
     ports:
