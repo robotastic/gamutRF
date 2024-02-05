@@ -1,20 +1,69 @@
 
+# Development
 
-# Repo Structure
+The best approach for doing development is to make changes within the repo and then build a new version of the GamutRF Docker container. To do that, run this docker command in the main directory of the repo:
+
+```bash
+docker build -t iqtlabs/gamutrf:latest .
+```
+
+Since it is tagged with **iqtlabs/gamutrf:latest** the docker-compose file (orchestrator.yml) will use the local image you just built instead of the one from docker hub. If you want to revert back to using the docker hub version simply run:
+
+```bash
+docker rmi iqtlabs/gamutrf:latest
+```
+
+This will of course generate lots of container images. To clean up old images, occasionally run:
+
+```bash
+docker system prune
+```
+
+### gr-iqtlabs Development
+
+If you are looking to make changes to [gr-iqtlabs](https://github.com/IQTLabs/gr-iqtlabs) and then test them inside GamutRF, the following approach should work. The gr-iqtlabs libraries are pulled in and built in a base Dockerfile, so some changes are needed.
+
+First, go and clone a local copy of the **gr-iqtlabs** repo. Make any changes you want. Because the **gr-iqtlabs** folder needs to be in the build context for the GamutRF base Dockerfile, you need to do some weird stuff. 
+
+In the **gamutrf** repo open the `docker/Dockerfile.base` file. Line 31 `RUN git clone https://github.com/iqtlabs/gr-iqtlabs -b 1.0.76` can be commented out.
+
+Line 32 `COPY --from=iqtlabs/gamutrf-vkfft:latest /root /root/gr-iqtlabs` needs to be updated to copy the files from your local copy of the **gr-iqtlabs** repo instead. The build will actually be done in the **gr-iqtlabs** folder, so make this change.
+```docker
+COPY . /root/gr-iqtlabs
+```
+
+Now make the following call while in the **gr-iqtlabs** repo folder, updated to reflect the correct path to the **Dockerfile.base** file:
+
+```bash
+docker build -f ../gamutRF/docker/Dockerfile.base -t iqtlabs/gamutrf-base:latest .
+```
+
+This will create a local version of the **gamutRF** base Dockerfile.
+
+After this is done you will need to create a new version of the local gamutrf:latest image. Go back to the **gamutrf** repo directory and run the following command:
+
+```bash
+docker build -t iqtlabs/gamutrf:latest .
+```
+
+Startup the `docker compose up` command and your changes to **gr-iqtlabs** should be included.
+
+
 
 ## Dockerfile structure
 
-- /Dockerfile: builds the **gamutrf** container
-- /docker: The Dockerfiles used to **build** the containers used in GamutRF
+- Dockerfile: builds the **gamutrf** container
+- docker/: The Dockerfiles used to **build** the containers used in GamutRF
    - Dockerfile.base: creates the build containers that are used along with the base container.
    - Dockerfile.driver: build container for the different Soapy Drivers used to support the SDRs
    - Dockerfile.uhd-sr: build container for the UHD sample recorder
 
 
+
 # Code Structure
 
 - gamutrf Docker Container  (./Dockerfile)
-  - gamurtrf/scan.py -> gamutrf-scan.py (/gamutrf/scan.py): parses all of the arguments
+  - gamurtrf/scan.py -> gamutrf-scan (/gamutrf/scan.py): parses all of the arguments
     - gamutrf/grscan.py:
 
 

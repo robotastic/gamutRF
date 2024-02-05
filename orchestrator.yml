@@ -5,20 +5,20 @@ networks:
     driver_opts:
       com.docker.network.driver.mtu: 9000
 services:
-  compass:
-    restart: always
-    image: iqtlabs/pibackbone-compass:v0.4.5
-    networks:
-      - gamutrf
-    devices:
-      - "/dev/i2c-1:/dev/i2c-1"
-    ports:
-      - '8000:8000'
-    command:
-      # Set correct compass settings for your compass and location
-      - --compass=qmc5883l
-      - --calibration=0
-      - --declination=0
+#  compass:
+#    restart: always
+#    image: iqtlabs/pibackbone-compass:v0.4.5
+#    networks:
+#      - gamutrf
+#    devices:
+#      - "/dev/i2c-1:/dev/i2c-1"
+#    ports:
+#      - '8000:8000'
+#    command:
+#      # Set correct compass settings for your compass and location
+#      - --compass=qmc5883l
+#      - --calibration=0
+#      - --declination=0
   mqtt:
     restart: always
     image: iqtlabs/edgetech-mqtt-dev:latest
@@ -43,18 +43,18 @@ services:
       - /dev/dri/renderD128:/dev/dri/renderD128
     # nvidia container toolkit etc must be installed.
     # Comment out "deploy" if on non-x86 platform (e.g. Pi4)
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: 1
+#              capabilities: [gpu]
     # if torchserve is not being used, comment out the
     # dependency.
-    depends_on:
-      torchserve:
-        condition: service_healthy
+#    depends_on:
+#      torchserve:
+#        condition: service_healthy
     volumes:
       - '${VOL_PREFIX}:/logs'
     command:
